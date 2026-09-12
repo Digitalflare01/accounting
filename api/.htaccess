@@ -1,0 +1,9 @@
+# ApexLedger API Subdirectory Rewrite Rules
+RewriteEngine On
+RewriteBase /api/
+
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+RewriteRule ^(.*)$ index.php [QSA,L]

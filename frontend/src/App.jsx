@@ -47,6 +47,10 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: loginEmail, password: loginPass })
       });
+      const contentType = res.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        throw new Error(`API server returned non-JSON response (${res.status} ${res.statusText}). Please ensure PHP backend and .htaccess are deployed.`);
+      }
       const data = await res.json();
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Authentication failed');

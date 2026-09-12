@@ -1,15 +1,18 @@
 <?php
-// Root router for WAMP Server and PHP Built-in Server
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+// Root router for ApexLedger (Supports Apache, WAMP, Hostinger, cPanel, and PHP Built-in Server)
+$uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
 
-// Check if request is for API
-if (strpos($uri, '/api') !== false) {
+// Normalize URI (strip subdirectories if hosted in a subfolder like /accounting)
+$normalizedUri = preg_replace('#^/accounting#', '', $uri);
+
+// Route: API requests
+if (preg_match('#^/api(?:/.*)?$#', $normalizedUri) || strpos($uri, '/api') !== false) {
     require_once __DIR__ . '/api/index.php';
     exit;
 }
 
-// Check if request is for Admin Portal
-if (preg_match('#^/(?:accounting/)?admin(?:/.*)?$#', $uri)) {
+// Route: Admin Portal
+if (preg_match('#^/admin(?:/.*)?$#', $normalizedUri)) {
     if (file_exists(__DIR__ . '/admin/index.html')) {
         header('Content-Type: text/html; charset=utf-8');
         header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
@@ -20,7 +23,7 @@ if (preg_match('#^/(?:accounting/)?admin(?:/.*)?$#', $uri)) {
     }
 }
 
-// Otherwise serve public/index.html (Client Accounting Portal)
+// Route: Client Accounting Portal (Serve public/index.html)
 if (file_exists(__DIR__ . '/public/index.html')) {
     header('Content-Type: text/html; charset=utf-8');
     header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');

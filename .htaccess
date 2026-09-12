@@ -1,18 +1,40 @@
-RewriteEngine On
+# ApexLedger Unified Web Server Configuration
+DirectoryIndex index.php index.html
 
-# Allow direct access to public folder assets
-RewriteCond %{REQUEST_FILENAME} -f
+RewriteEngine On
+RewriteBase /
+
+# Prevent directory listings
+Options -Indexes
+
+# Security: Deny access to sensitive files
+<FilesMatch "\.(env|sql|sqlite|log|git.*)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Allow direct access to existing files and directories
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# Route API calls
-RewriteRule ^api/(.*)$ api/index.php [QSA,L]
+# Route API requests to api/index.php
+RewriteRule ^api(?:/(.*))?$ api/index.php [QSA,L]
 
-# Prevent caching of HTML responses
+# Route Admin portal
+RewriteRule ^admin(?:/(.*))?$ admin/index.html [QSA,L]
+
+# Route all other frontend requests to index.php
+RewriteRule ^ index.php [QSA,L]
+
+# Disable browser caching for HTML & dynamic responses
 <IfModule mod_headers.c>
     Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
     Header set Pragma "no-cache"
     Header set Expires "0"
 </IfModule>
-
-# Route everything else to root index.php
-RewriteRule ^ index.php [QSA,L]

@@ -37,9 +37,11 @@ spl_autoload_register(function ($class) {
 });
 
 // Parse URI Path
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
 $uri = preg_replace('#^/accounting#', '', $uri); // Strip subdirectory if hosted in WAMP
-$uri = preg_replace('#^/api/#', '/', $uri);     // Normalize /api/... to /...
+$uri = preg_replace('#^/api/index\.php#', '/api', $uri); // Strip index.php within api
+$uri = preg_replace('#^/index\.php#', '', $uri); // Strip root index.php
+$uri = preg_replace('#^/api(?:/|$)#', '/', $uri); // Normalize /api/... or /api to /...
 $uri = rtrim($uri, '/');
 if (empty($uri)) {
     $uri = '/';
