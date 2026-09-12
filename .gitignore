@@ -1,0 +1,24 @@
+# Environment & Secrets
+.env
+*.env.local
+
+# Runtime Databases & Logs
+database/*.sqlite
+database/*.sqlite-journal
+database/*.db
+*.log
+scratch/
+
+# Python & Node
+__pycache__/
+*.py[cod]
+*$py.class
+node_modules/
+vendor/
+
+# OS & Editor Files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

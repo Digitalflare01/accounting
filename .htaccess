@@ -1,0 +1,18 @@
+RewriteEngine On
+
+# Allow direct access to public folder assets
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# Route API calls
+RewriteRule ^api/(.*)$ api/index.php [QSA,L]
+
+# Prevent caching of HTML responses
+<IfModule mod_headers.c>
+    Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+</IfModule>
+
+# Route everything else to root index.php
+RewriteRule ^ index.php [QSA,L]
